@@ -1,0 +1,9 @@
+pandas
+google-cloud-storage
+google-auth
+gcsfs
+deap
+markdown
+streamlit
+IPython
+google-python-cloud-debugger
