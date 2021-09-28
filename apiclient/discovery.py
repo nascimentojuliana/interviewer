@@ -36,10 +36,9 @@ import mimetypes
 import os
 import re
 import urllib
-import urlparse
 
 try:
-  from urlparse import parse_qsl
+  from urllib.parse import parse_qsl
 except ImportError:
   from cgi import parse_qsl
 
@@ -246,7 +245,7 @@ def build_from_document(
 
   if isinstance(service, basestring):
     service = simplejson.loads(service)
-  base = urlparse.urljoin(service['rootUrl'], service['servicePath'])
+  base = urllib.parse.urljoin(service['rootUrl'], service['servicePath'])
   schema = Schemas(service)
 
   if model is None:
@@ -640,7 +639,7 @@ def createMethod(methodName, methodDesc, rootDesc, schema):
         actual_path_params, actual_query_params, body_value)
 
     expanded_url = uritemplate.expand(pathUrl, params)
-    url = urlparse.urljoin(self._baseUrl, expanded_url + query)
+    url = urllib.parse.urljoin(self._baseUrl, expanded_url + query)
 
     resumable = None
     multipart_boundary = ''
@@ -666,7 +665,7 @@ def createMethod(methodName, methodDesc, rootDesc, schema):
 
       # Use the media path uri for media uploads
       expanded_url = uritemplate.expand(mediaPathUrl, params)
-      url = urlparse.urljoin(self._baseUrl, expanded_url + query)
+      url = urllib.parse.urljoin(self._baseUrl, expanded_url + query)
       if media_upload.resumable():
         url = _add_query_parameter(url, 'uploadType', 'resumable')
 
@@ -803,14 +802,14 @@ Returns:
     request = copy.copy(previous_request)
 
     pageToken = previous_response['nextPageToken']
-    parsed = list(urlparse.urlparse(request.uri))
+    parsed = list(urllib.parse.urlparse(request.uri))
     q = parse_qsl(parsed[4])
 
     # Find and remove old 'pageToken' value from URI
     newq = [(key, value) for (key, value) in q if key != 'pageToken']
     newq.append(('pageToken', pageToken))
     parsed[4] = urllib.urlencode(newq)
-    uri = urlparse.urlunparse(parsed)
+    uri = urllib.parse.urlunparse(parsed)
 
     request.uri = uri
 
