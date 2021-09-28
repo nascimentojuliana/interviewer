@@ -17,7 +17,6 @@ from google.oauth2.credentials import Credentials
 import base64
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from apiclient import errors, discovery
 import mimetypes
 from email.mime.image import MIMEImage
 from email.mime.audio import MIMEAudio
@@ -77,8 +76,8 @@ def SendMessageInternal(user_id, message):
         message = (service.users().messages().send(userId=user_id, body=message).execute())
         print('Message Id: %s' % message['id'])
         return message
-    except errors.HttpError as error:
-        print('An error occurred: %s' % error)
+    except:
+        print('An error occurred')
         return "Error"
     return "OK"
 
