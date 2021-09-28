@@ -6,4 +6,4 @@ deap
 markdown
 streamlit
 IPython
-google-python-cloud-debugger
+pydata_google_auth
