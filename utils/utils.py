@@ -1,18 +1,12 @@
 import os
-import numpy as np
-from PIL import Image
-import streamlit as st
-
+from io import BytesIO, StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
 
-
 from googleapiclient.discovery import build
-
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-
 
 import base64
 from email.mime.multipart import MIMEMultipart
@@ -76,8 +70,8 @@ def SendMessageInternal(user_id, message):
         message = (service.users().messages().send(userId=user_id, body=message).execute())
         print('Message Id: %s' % message['id'])
         return message
-    except:
-        print('An error occurred')
+    except errors.HttpError as error:
+        print('An error occurred: %s' % error)
         return "Error"
     return "OK"
 
