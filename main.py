@@ -70,7 +70,8 @@ try:
 	else:
 		df = pd.read_csv('questoes.csv')
 except:
-	print('Você pode não ter credenciais válidas para usar esse aplicativo')
+	'Você pode não ter credenciais válidas para usar esse aplicativo'
+	break
 
 dict_temas = {}
 
