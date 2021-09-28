@@ -298,7 +298,7 @@ def _media_size_to_long(maxSize):
     The size as an integer value.
   """
   if len(maxSize) < 2:
-    return 0L
+    return 0
   units = maxSize[-2:].upper()
   bit_shift = _MEDIA_SIZE_BIT_SHIFTS.get(units)
   if bit_shift is not None:
