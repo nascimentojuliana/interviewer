@@ -71,7 +71,6 @@ try:
 		df = pd.read_csv('questoes.csv')
 except:
 	'Você pode não ter credenciais válidas para usar esse aplicativo'
-	break
 
 dict_temas = {}
 
