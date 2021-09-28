@@ -18,8 +18,9 @@ from google.oauth2 import service_account
 from IPython.core.display import display,HTML
 
 
-project_id = st.secrets["project_id"]
-bucket_name = st.secrets["bucket_name"]
+project_id = 'sas-sandbox-advanced-analytics'
+bucket_name = 'interviewer'
+
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
 #credentials = service_account.Credentials.from_service_account_file(account)
