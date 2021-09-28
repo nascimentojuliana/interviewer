@@ -4,6 +4,7 @@ htmlcov-py38/
 .env
 .jpgeg
 .csv
+.toml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -18,11 +18,8 @@ from google.oauth2 import service_account
 from IPython.core.display import display,HTML
 
 
-
-project_id = 'sas-sandbox-advanced-analytics'
-
-bucket_name = 'interviewer'
-
+project_id = os.environ["project_id"]
+bucket_name = st.secrets["bucket_name"]
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
 #credentials = service_account.Credentials.from_service_account_file(account)
@@ -30,14 +27,29 @@ bucket_name = 'interviewer'
 #fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, account)
 #df = pd.read_csv(fileobj)
 
-diretorio = pathlib.Path('/home')
-arquivos = diretorio.glob('**/application_default_credentials.json')
-for arquivo in arquivos:
-	path = str(arquivo)
+left_column, central_colum, right_column = st.columns(3)
+with central_colum:
+	st.image('chapeu.jpg')
+
+	original_title = '<p style="font-family:Courier; color:Black; font-size: 30px;">* Sorting * *** Hat  ***</p>'
+	st.markdown(original_title, unsafe_allow_html=True)
 
 
-fs = gcsfs.GCSFileSystem(project=project_id, token=path)
+#st.sidebar.text_input("ID do processo seletivo", key="id")
+
+st.sidebar.text_input("Email do candidato", key="name")
+
+cargo = st.sidebar.selectbox(
+    'Posição',
+    ('Cientista Junior', 'Cientista Pleno', 'Cientista Senior')
+)
+
 try:
+	fs = gcsfs.GCSFileSystem(project=project_id, token=path)
+	diretorio = pathlib.Path('/home')
+	arquivos = diretorio.glob('**/application_default_credentials.json')
+	for arquivo in arquivos:
+		path = str(arquivo)
 	if fs:
 		with fs.open('interviewer/questoes.csv') as f:
 			df = pd.read_csv(f)
@@ -57,23 +69,6 @@ try:
 		df = pd.read_csv('questoes.csv')
 except:
 	print('Você não tem credenciais válidas para acesso e pode não conseguir rodar esse aplicativo')
-
-left_column, central_colum, right_column = st.columns(3)
-with central_colum:
-	st.image('chapeu.jpg')
-
-	original_title = '<p style="font-family:Courier; color:Black; font-size: 30px;">* Sorting * *** Hat  ***</p>'
-	st.markdown(original_title, unsafe_allow_html=True)
-
-
-#st.sidebar.text_input("ID do processo seletivo", key="id")
-
-st.sidebar.text_input("Email do candidato", key="name")
-
-cargo = st.sidebar.selectbox(
-    'Posição',
-    ('Cientista Junior', 'Cientista Pleno', 'Cientista Senior')
-)
 
 dict_temas = {}
 
