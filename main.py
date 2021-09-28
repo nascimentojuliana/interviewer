@@ -18,7 +18,7 @@ from google.oauth2 import service_account
 from IPython.core.display import display,HTML
 
 
-project_id = os.environ["project_id"]
+project_id = st.secrets["project_id"]
 bucket_name = st.secrets["bucket_name"]
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
@@ -26,6 +26,7 @@ bucket_name = st.secrets["bucket_name"]
 
 #fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, account)
 #df = pd.read_csv(fileobj)
+
 
 left_column, central_colum, right_column = st.columns(3)
 with central_colum:
@@ -68,7 +69,7 @@ try:
 	else:
 		df = pd.read_csv('questoes.csv')
 except:
-	print('Você não tem credenciais válidas para acesso e pode não conseguir rodar esse aplicativo')
+	print('Você pode não ter credenciais válidas para usar esse aplicativo')
 
 dict_temas = {}
 
