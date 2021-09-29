@@ -50,9 +50,10 @@ cargo = st.sidebar.selectbox(
 diretorio = pathlib.Path('/home')
 arquivos = diretorio.glob('**/application_default_credentials.json')
 for arquivo in arquivos:
+	arquivo
 	path = str(arquivo)
 
-path
+#path
 
 # fs = gcsfs.GCSFileSystem(project=project_id, token=path)
 # if fs:
