@@ -55,8 +55,10 @@ for arquivo in arquivos:
 
 import os
 path  =os.path.abspath(os.getcwd())
-path = '/home/' + path.split('/')[-4] + '/.config/gcloud/application_default_credentials.json'
 path
+
+#path = '/home/' + path.split('/')[-4] + '/.config/gcloud/application_default_credentials.json'
+#path
 #path
 
 # fs = gcsfs.GCSFileSystem(project=project_id, token=path)
