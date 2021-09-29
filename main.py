@@ -47,11 +47,12 @@ cargo = st.sidebar.selectbox(
 )
 
 try:
-	fs = gcsfs.GCSFileSystem(project=project_id, token=path)
 	diretorio = pathlib.Path('/home')
 	arquivos = diretorio.glob('**/application_default_credentials.json')
 	for arquivo in arquivos:
 		path = str(arquivo)
+
+	fs = gcsfs.GCSFileSystem(project=project_id, token=path)
 	if fs:
 		with fs.open('interviewer/questoes.csv') as f:
 			df = pd.read_csv(f)
