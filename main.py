@@ -46,32 +46,32 @@ cargo = st.sidebar.selectbox(
     ('Cientista Junior', 'Cientista Pleno', 'Cientista Senior')
 )
 
-try:
-	diretorio = pathlib.Path('/home')
-	arquivos = diretorio.glob('**/application_default_credentials.json')
-	for arquivo in arquivos:
-		path = str(arquivo)
+#try:
+diretorio = pathlib.Path('/home')
+arquivos = diretorio.glob('**/application_default_credentials.json')
+for arquivo in arquivos:
+	path = str(arquivo)
 
-	fs = gcsfs.GCSFileSystem(project=project_id, token=path)
-	if fs:
-		with fs.open('interviewer/questoes.csv') as f:
-			df = pd.read_csv(f)
+fs = gcsfs.GCSFileSystem(project=project_id, token=path)
+if fs:
+	with fs.open('interviewer/questoes.csv') as f:
+		df = pd.read_csv(f)
 
-		#credentials = get_credentials(project_id,bucket_name,service_account)
-		credentials = pydata_google_auth.get_user_credentials(
-		    ['https://www.googleapis.com/auth/cloud-platform'],
-		)
+	#credentials = get_credentials(project_id,bucket_name,service_account)
+	credentials = pydata_google_auth.get_user_credentials(
+	    ['https://www.googleapis.com/auth/cloud-platform'],
+	)
 
-		gcs_client = storage.Client(project=project_id, credentials=credentials)
+	gcs_client = storage.Client(project=project_id, credentials=credentials)
 
-		#gcs_client = storage.Client(project=project_id)
+	#gcs_client = storage.Client(project=project_id)
 
-		bucket = gcs_client.get_bucket(bucket_name)
+	bucket = gcs_client.get_bucket(bucket_name)
 
-	else:
-		df = pd.read_csv('questoes.csv')
-except:
-	'Você pode não ter credenciais válidas para usar esse aplicativo'
+else:
+	df = pd.read_csv('questoes.csv')
+#except:
+#	'Você pode não ter credenciais válidas para usar esse aplicativo'
 
 dict_temas = {}
 
