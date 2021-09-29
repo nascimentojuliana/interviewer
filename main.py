@@ -49,11 +49,14 @@ cargo = st.sidebar.selectbox(
 #try:
 diretorio = pathlib.Path('/home')
 arquivos = diretorio.glob('**/application_default_credentials.json')
-arquivos
 for arquivo in arquivos:
-	arquivo
 	path = str(arquivo)
 
+
+import os
+path  =os.path.abspath(os.getcwd())
+path = '/home/' + path.split('/')[-4] + '/.config/gcloud/application_default_credentials.json'
+path
 #path
 
 # fs = gcsfs.GCSFileSystem(project=project_id, token=path)
