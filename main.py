@@ -23,10 +23,13 @@ bucket_name = st.secrets["bucket_name"]
 
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
+with open('sas-sandbox-advanced-analytics-7b8b0505d8dd.json', 'r', encoding='utf8') as f:
+    account = json.load(f)
+
 #credentials = service_account.Credentials.from_service_account_file(account)
 
-#fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, account)
-#df = pd.read_csv(fileobj)
+fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, account)
+df = pd.read_csv(fileobj)
 
 
 left_column, central_colum, right_column = st.columns(3)
@@ -47,15 +50,12 @@ cargo = st.sidebar.selectbox(
 )
 
 #try:
-diretorio = pathlib.Path('/home')
-arquivos = diretorio.glob('**/application_default_credentials.json')
-for arquivo in arquivos:
-	path = str(arquivo)
+#diretorio = pathlib.Path('/home')
+#arquivos = diretorio.glob('**/application_default_credentials.json')
+#for arquivo in arquivos:
+#	path = str(arquivo)
 
 
-import os
-path  =os.path.abspath(os.getcwd())
-path
 
 #path = '/home/' + path.split('/')[-4] + '/.config/gcloud/application_default_credentials.json'
 #path
