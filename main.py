@@ -23,12 +23,12 @@ bucket_name = st.secrets["bucket_name"]
 
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
-with open('sas-sandbox-advanced-analytics-7b8b0505d8dd.json', 'r', encoding='utf8') as f:
-    account = json.load(f)
+#with open('sas-sandbox-advanced-analytics-7b8b0505d8dd.json') as file:
+account = st.secrets["account"]
 
-#credentials = service_account.Credentials.from_service_account_file(account)
+credentials = service_account.Credentials.from_service_account_info(account)
 
-fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, account)
+fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, credentials)
 df = pd.read_csv(fileobj)
 
 
