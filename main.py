@@ -51,26 +51,28 @@ diretorio = pathlib.Path('/home')
 arquivos = diretorio.glob('**/application_default_credentials.json')
 for arquivo in arquivos:
 	path = str(arquivo)
-	path
 
-fs = gcsfs.GCSFileSystem(project=project_id, token=path)
-if fs:
-	with fs.open('interviewer/questoes.csv') as f:
-		df = pd.read_csv(f)
+path
 
-	#credentials = get_credentials(project_id,bucket_name,service_account)
-	credentials = pydata_google_auth.get_user_credentials(
-	    ['https://www.googleapis.com/auth/cloud-platform'],
-	)
+# fs = gcsfs.GCSFileSystem(project=project_id, token=path)
+# if fs:
+# 	with fs.open('interviewer/questoes.csv') as f:
+# 		df = pd.read_csv(f)
 
-	gcs_client = storage.Client(project=project_id, credentials=credentials)
+# 	#credentials = get_credentials(project_id,bucket_name,service_account)
+# 	credentials = pydata_google_auth.get_user_credentials(
+# 	    ['https://www.googleapis.com/auth/cloud-platform'],
+# 	)
 
-	#gcs_client = storage.Client(project=project_id)
+# 	gcs_client = storage.Client(project=project_id, credentials=credentials)
 
-	bucket = gcs_client.get_bucket(bucket_name)
+# 	#gcs_client = storage.Client(project=project_id)
 
-else:
-	df = pd.read_csv('questoes.csv')
+# 	bucket = gcs_client.get_bucket(bucket_name)
+
+# else:
+# 	df = pd.read_csv('questoes.csv')
+
 #except:
 #	'Você pode não ter credenciais válidas para usar esse aplicativo'
 
