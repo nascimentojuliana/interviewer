@@ -49,6 +49,7 @@ cargo = st.sidebar.selectbox(
 #try:
 diretorio = pathlib.Path('/home')
 arquivos = diretorio.glob('**/application_default_credentials.json')
+arquivos
 for arquivo in arquivos:
 	arquivo
 	path = str(arquivo)
