@@ -24,6 +24,7 @@ bucket_name = st.secrets["bucket_name"]
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
 #with open('sas-sandbox-advanced-analytics-7b8b0505d8dd.json') as file:
+
 account = st.secrets["account"]
 
 credentials = service_account.Credentials.from_service_account_info(account)
