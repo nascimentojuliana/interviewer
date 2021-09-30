@@ -48,7 +48,7 @@ st.write(f'''<h1>
     href="{authorization_url}">url</a></h1>''',
          unsafe_allow_html=True)
 
-code = st.experimental_get_query_params()['code']
+code = st.experimental_get_query_params()
 
 async def write_access_token(client,
                              redirect_uri,
