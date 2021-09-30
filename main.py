@@ -5,6 +5,7 @@ import random
 import gcsfs
 import markdown
 import pathlib
+import asyncio
 import pandas as pd
 import numpy as np
 from PIL import Image
@@ -16,25 +17,65 @@ from io import BytesIO, StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
 from IPython.core.display import display,HTML
+from httpx_oauth.clients.google import GoogleOAuth2
 
 
 project_id = st.secrets["project_id"]
 bucket_name = st.secrets["bucket_name"]
+
+
+client_id = st.secrets['client_id'] 
+client_secret = st.secrets['client_secret'] 
+redirect_uri = st.secrets['redirect_uri']
+
+client = GoogleOAuth2(client_id, client_secret)
+
+async def write_authorization_url(client,
+                                  redirect_uri):
+    authorization_url = await client.get_authorization_url(
+        redirect_uri,
+        scope=["email"],
+        extras_params={"access_type": "offline"},
+    )
+    return authorization_url
+
+authorization_url = asyncio.run(
+    write_authorization_url(client=client,
+                            redirect_uri=redirect_uri)
+)
+st.write(f'''<h1>
+    Please login using this <a target="_self"
+    href="{authorization_url}">url</a></h1>''',
+         unsafe_allow_html=True)
+
+code = st.experimental_get_query_params()['code']
+
+async def write_access_token(client,
+                             redirect_uri,
+                             code):
+    token = await client.get_access_token(code, redirect_uri)
+    return token
+
+token = asyncio.run(
+    write_access_token(client=client,
+                       redirect_uri=redirect_uri,
+                       code=code))
+session_state.token = token
 
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
 #credentials = service_account.Credentials.from_service_account_file(account)
 
 #credentials = get_credentials(project_id,bucket_name,service_account)
-path = 'gs://interviewer/questoes.csv'
+#path = 'gs://interviewer/questoes.csv'
 
-credentials = pydata_google_auth.get_user_credentials(['https://www.googleapis.com/auth/cloud-platform'],)
+#credentials = pydata_google_auth.get_user_credentials(['https://www.googleapis.com/auth/cloud-platform'],)
 
-gcs_client = storage.Client(project=project_id, credentials=credentials)
+#gcs_client = storage.Client(project=project_id, credentials=credentials)
 
-bucket = gcs_client.get_bucket(bucket_name)
+#bucket = gcs_client.get_bucket(bucket_name)
 
-df = pd.read_csv(path)
+#df = pd.read_csv(path)
 
 #fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, credentials)
 #df = pd.read_csv(fileobj)
@@ -69,10 +110,10 @@ cargo = st.sidebar.selectbox(
 #path
 #path
 
-# fs = gcsfs.GCSFileSystem(project=project_id, token=path)
-# if fs:
-# 	with fs.open('interviewer/questoes.csv') as f:
-# 		df = pd.read_csv(f)
+fs = gcsfs.GCSFileSystem(project=project_id, token=token)
+if fs:
+ 	with fs.open('interviewer/questoes.csv') as f:
+ 		df = pd.read_csv(f)
 
 # 	#credentials = get_credentials(project_id,bucket_name,service_account)
 # 	credentials = pydata_google_auth.get_user_credentials(
