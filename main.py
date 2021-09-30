@@ -23,14 +23,21 @@ bucket_name = st.secrets["bucket_name"]
 
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
-#with open('sas-sandbox-advanced-analytics-7b8b0505d8dd.json') as file:
+#credentials = service_account.Credentials.from_service_account_file(account)
 
-account = st.secrets["account"]
+#credentials = get_credentials(project_id,bucket_name,service_account)
+path = 'gs://interviewer/questoes.csv'
 
-credentials = service_account.Credentials.from_service_account_info(account)
+credentials = pydata_google_auth.get_user_credentials(['https://www.googleapis.com/auth/cloud-platform'],)
 
-fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, credentials)
-df = pd.read_csv(fileobj)
+gcs_client = storage.Client(project=project_id, credentials=credentials)
+
+bucket = gcs_client.get_bucket(bucket_name)
+
+df = pd.read_csv(path)
+
+#fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, credentials)
+#df = pd.read_csv(fileobj)
 
 
 left_column, central_colum, right_column = st.columns(3)
@@ -173,11 +180,17 @@ with st.form("my_form"):
 							questoes[i]
 						except:
 							questoes[i]
-					if fs:
-						destionation_blob_name = '{}/questoes.csv'.format(st.session_state.name)
-						bucket.blob(destionation_blob_name).upload_from_string(final.to_csv(), 'text/csv')
-					else:
-						final.to_csv('{}_questoes.csv'.format(st.session_state.name))
+					#if fs:
+				#		destionation_blob_name = '{}/questoes.csv'.format(st.session_state.name)
+			#			bucket.blob(destionation_blob_name).upload_from_string(final.to_csv(), 'text/csv')
+			#		else:
+			#			final.to_csv('{}_questoes.csv'.format(st.session_state.name))
+    				f = StringIO()
+				    final.to_csv(f, index=False)
+				    f.seek(0)
+				    blob = bucket.blob('{}/questoes.csv'.format(st.session_state.name))
+				    blob.upload_from_file(f, content_type='text/csv')
+					
 
 with st.form("my_form1"):
 

@@ -1,4 +1,6 @@
 import os
+import io
+import pandas as pd
 from io import BytesIO, StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
@@ -75,6 +77,38 @@ def SendMessageInternal(user_id, message):
         return "Error"
     return "OK"
 
+def export_gcs(export_object, output_path, bucket, index=False):
+    """
+    Export export_object to output_path with a connected bucket.
+    Usage:
+    export_object: object file that will be exported
+    output_path: output path inside bucket
+    bucket: connected bucket via get_bucket
+    """
+    try:
+        export_object = json.dumps(export_object)
+    except BaseException:
+        pass
+
+    if isinstance(export_object, (pd.DataFrame, pd.Series, str)):
+        f = io.StringIO()
+
+        if isinstance(export_object, (pd.DataFrame, pd.Series)):
+            export_object.to_csv(f, index=False, header=True, sep='|', encoding='latin-1')
+
+        elif isinstance(export_object, str):
+            f.write(export_object)
+    else:
+        f = io.BytesIO()
+        pickle.dump(export_object, f)
+
+    f.seek(0)
+
+    blob = bucket.blob(output_path)
+    storage.blob._MAX_MULTIPART_SIZE = 5 * 1024 * 1024
+    blob._chunk_size = 1024 * 1024 * 16  # = 8 MB
+    blob.upload_from_file(f.getvalue(), content_type='text/csv')
+
 
 def get_bytestring(project: str,
                    bucket: str,
@@ -95,9 +129,9 @@ def get_bytestring(project: str,
 
 
 def _get_blob(bucket_name, path, project, service_account_credentials_path):
-    credentials = service_account.Credentials.from_service_account_file(
-        service_account_credentials_path) if service_account_credentials_path else None
-    storage_client = storage.Client(project=project, credentials=credentials)
+    #credentials = service_account.Credentials.from_service_account_file(
+    #    service_account_credentials_path) if service_account_credentials_path else None
+    storage_client = storage.Client(project=project, credentials=service_account_credentials_path)
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(path)
     return blob
