@@ -13,10 +13,16 @@ import streamlit as st
 from utils import utils
 import pydata_google_auth
 from seletor import Seletor
-from io import BytesIO, StringIO
+from io import BytesIO
+from io import StringIO
 from google.cloud import storage
 from google.oauth2 import service_account
 from IPython.core.display import display,HTML
+from httpx_oauth.clients.google import GoogleOAuth2
+
+import asyncio
+
+from session_state import get
 from httpx_oauth.clients.google import GoogleOAuth2
 
 
@@ -28,27 +34,16 @@ client_id = st.secrets['client_id']
 client_secret = st.secrets['client_secret'] 
 redirect_uri = st.secrets['redirect_uri']
 
-client = GoogleOAuth2(client_id, client_secret)
 
 async def write_authorization_url(client,
                                   redirect_uri):
     authorization_url = await client.get_authorization_url(
         redirect_uri,
-        scope=["email"],
+        scope=["profile", "email"],
         extras_params={"access_type": "offline"},
     )
     return authorization_url
 
-authorization_url = asyncio.run(
-    write_authorization_url(client=client,
-                            redirect_uri=redirect_uri)
-)
-st.write(f'''<h1>
-    Please login using this <a target="_self"
-    href="{authorization_url}">url</a></h1>''',
-         unsafe_allow_html=True)
-
-code = st.experimental_get_query_params()
 
 async def write_access_token(client,
                              redirect_uri,
@@ -56,26 +51,81 @@ async def write_access_token(client,
     token = await client.get_access_token(code, redirect_uri)
     return token
 
-token = asyncio.run(
-    write_access_token(client=client,
-                       redirect_uri=redirect_uri,
-                       code=code))
-session_state.token = token
+
+async def get_email(client,
+                    token):
+    user_id, user_email = await client.get_id_email(token)
+    return user_id, user_email
+
+
+def main(user_id, user_email):
+    st.write(f"You're logged in as {user_email}")
+
+client = GoogleOAuth2(client_id, client_secret)
+authorization_url = asyncio.run(
+    write_authorization_url(client=client,
+                            redirect_uri=redirect_uri)
+)
+
+session_state = get(token=None)
+if session_state.token is None:
+    try:
+        code = st.experimental_get_query_params()['code']
+    except:
+        st.write(f'''<h1>
+            Please login using this <a target="_self"
+            href="{authorization_url}">url</a></h1>''',
+                 unsafe_allow_html=True)
+    else:
+        # Verify token is correct:
+        try:
+            token = asyncio.run(
+                write_access_token(client=client,
+                                   redirect_uri=redirect_uri,
+                                   code=code))
+        except:
+            st.write(f'''<h1>
+                This account is not allowed or page was refreshed.
+                Please try again: <a target="_self"
+                href="{authorization_url}">url</a></h1>''',
+                     unsafe_allow_html=True)
+        else:
+            # Check if token has expired:
+            if token.is_expired():
+                if token.is_expired():
+                    st.write(f'''<h1>
+                    Login session has ended,
+                    please <a target="_self" href="{authorization_url}">
+                    login</a> again.</h1>
+                    ''')
+            else:
+                session_state.token = token
+                user_id, user_email = asyncio.run(
+                    get_email(client=client,
+                              token=token['access_token'])
+                )
+                session_state.user_id = user_id
+                session_state.user_email = user_email
+                main(user_id=session_state.user_id,
+                     user_email=session_state.user_email)
+else:
+    main(user_id=session_state.user_id,
+         user_email=session_state.user_email)
 
 #account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
 
 #credentials = service_account.Credentials.from_service_account_file(account)
 
 #credentials = get_credentials(project_id,bucket_name,service_account)
-#path = 'gs://interviewer/questoes.csv'
+path = 'gs://interviewer/questoes.csv'
 
 #credentials = pydata_google_auth.get_user_credentials(['https://www.googleapis.com/auth/cloud-platform'],)
 
-#gcs_client = storage.Client(project=project_id, credentials=credentials)
+gcs_client = storage.Client(project=project_id)
 
-#bucket = gcs_client.get_bucket(bucket_name)
+bucket = gcs_client.get_bucket(bucket_name)
 
-#df = pd.read_csv(path)
+df = pd.read_csv(path)
 
 #fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, credentials)
 #df = pd.read_csv(fileobj)
@@ -110,10 +160,10 @@ cargo = st.sidebar.selectbox(
 #path
 #path
 
-fs = gcsfs.GCSFileSystem(project=project_id, token=token)
-if fs:
- 	with fs.open('interviewer/questoes.csv') as f:
- 		df = pd.read_csv(f)
+#fs = gcsfs.GCSFileSystem(project=project_id, token=token)
+#if fs:
+# 	with fs.open('interviewer/questoes.csv') as f:
+# 		df = pd.read_csv(f)
 
 # 	#credentials = get_credentials(project_id,bucket_name,service_account)
 # 	credentials = pydata_google_auth.get_user_credentials(
