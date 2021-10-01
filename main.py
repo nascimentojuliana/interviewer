@@ -17,28 +17,7 @@ from google.cloud import storage
 from google.oauth2 import service_account
 from IPython.core.display import display,HTML
 
-
-project_id = st.secrets["project_id"]
-bucket_name = st.secrets["bucket_name"]
-
-#account = 'sas-sandbox-advanced-analytics-7b8b0505d8dd.json'
-
-#credentials = service_account.Credentials.from_service_account_file(account)
-
-#credentials = get_credentials(project_id,bucket_name,service_account)
-path = 'gs://interviewer/questoes.csv'
-
-credentials = pydata_google_auth.get_user_credentials(['https://www.googleapis.com/auth/cloud-platform'],)
-
-gcs_client = storage.Client(project=project_id, credentials=credentials)
-
-bucket = gcs_client.get_bucket(bucket_name)
-
-df = pd.read_csv(path)
-
-#fileobj = utils.get_byte_fileobj(project_id, bucket_name, path, credentials)
-#df = pd.read_csv(fileobj)
-
+df_i = pd.read_csv('questoes.csv')
 
 left_column, central_colum, right_column = st.columns(3)
 with central_colum:
@@ -48,48 +27,11 @@ with central_colum:
 	st.markdown(original_title, unsafe_allow_html=True)
 
 
-#st.sidebar.text_input("ID do processo seletivo", key="id")
-
 st.sidebar.text_input("Email do candidato", key="name")
 
 cargo = st.sidebar.selectbox(
     'Posição',
-    ('Cientista Junior', 'Cientista Pleno', 'Cientista Senior')
-)
-
-#try:
-#diretorio = pathlib.Path('/home')
-#arquivos = diretorio.glob('**/application_default_credentials.json')
-#for arquivo in arquivos:
-#	path = str(arquivo)
-
-
-
-#path = '/home/' + path.split('/')[-4] + '/.config/gcloud/application_default_credentials.json'
-#path
-#path
-
-# fs = gcsfs.GCSFileSystem(project=project_id, token=path)
-# if fs:
-# 	with fs.open('interviewer/questoes.csv') as f:
-# 		df = pd.read_csv(f)
-
-# 	#credentials = get_credentials(project_id,bucket_name,service_account)
-# 	credentials = pydata_google_auth.get_user_credentials(
-# 	    ['https://www.googleapis.com/auth/cloud-platform'],
-# 	)
-
-# 	gcs_client = storage.Client(project=project_id, credentials=credentials)
-
-# 	#gcs_client = storage.Client(project=project_id)
-
-# 	bucket = gcs_client.get_bucket(bucket_name)
-
-# else:
-# 	df = pd.read_csv('questoes.csv')
-
-#except:
-#	'Você pode não ter credenciais válidas para usar esse aplicativo'
+    ('Cientista Junior', 'Cientista Pleno', 'Cientista Senior'))
 
 dict_temas = {}
 
@@ -101,7 +43,7 @@ with st.form("my_form"):
 
 	if checkbox0:
 
-		temas = list(set((df.TEMA).to_list()))
+		temas = list(set((df_i.TEMA).to_list()))
 
 		temas_escolhidos = st.multiselect('Quais temas você quer?', temas)
 
@@ -128,9 +70,9 @@ with st.form("my_form"):
 
 				qtd_perguntas = sum(qtd_temas)
 
-				mask = df['TEMA'].isin(temas_escolhidos)
+				mask = df_i['TEMA'].isin(temas_escolhidos)
 
-				df = df[mask].reset_index(drop=True)
+				df = df_i[mask].reset_index(drop=True)
 
 				IND_INIT_SIZE = len(df)
 
@@ -180,16 +122,8 @@ with st.form("my_form"):
 							questoes[i]
 						except:
 							questoes[i]
-					#if fs:
-				#		destionation_blob_name = '{}/questoes.csv'.format(st.session_state.name)
-			#			bucket.blob(destionation_blob_name).upload_from_string(final.to_csv(), 'text/csv')
-			#		else:
-			#			final.to_csv('{}_questoes.csv'.format(st.session_state.name))
-					f = StringIO()
-					final.to_csv(f, index=False)
-					f.seek(0)
-					blob = bucket.blob('{}/questoes.csv'.format(st.session_state.name))
-					blob.upload_from_file(f, content_type='text/csv')
+
+					final.to_csv('{}_questoes.csv'.format(st.session_state.name), index=False)
 					
 
 with st.form("my_form1"):
@@ -200,22 +134,10 @@ with st.form("my_form1"):
 
 	if checkbox1:
 
-		diretorio = pathlib.Path('/home')
-		arquivos = diretorio.glob('**/application_default_credentials.json')
-		for arquivo in arquivos:
-			path = str(arquivo)
-
-		#df1 = pd.read_csv('{}_questoes.csv'.format(st.session_state.name))
 		try:
-			#fs = gcsfs.GCSFileSystem(project=project_id, token=path)
-			if fs:
-				with fs.open('interviewer/{}/questoes.csv'.format(st.session_state.name)) as f:
-					df1 = pd.read_csv(f)
-			else:
-				df1 = pd.read_csv('{}_questoes.csv'.format(st.session_state.name))
-
+			df1 = pd.read_csv('{}_questoes.csv'.format(st.session_state.name), encoding='latin-1')
 		except:
-			'Digite um email válido e existente para esse processo seletivo ou se suas credenciais são válidas'
+			'Digite um email válido e existente para esse processo seletivo	'
 
 		questoes = []
 		imagens = []
@@ -229,28 +151,12 @@ with st.form("my_form1"):
 				contador = contador+1 
 				imagens.append(link)
 
-		#left_column, central_column, right_column = st.columns(3)
-		#with left_column:
 		nota = []
 		for i, item in enumerate(imagens):
 			st.image(item)
 			questoes[i]
 			result = st.selectbox('Selecione o valor para a questão {}'.format(i+1), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 			nota.append(result)
-
-		#with central_column:
-		#		for i, item in enumerate(imagens):
-		#				try:
-		#			st.image(item)
-		#		except:
-		#			'NaN'
-
-		#nota = []
-		#with right_column:
-		#		for i, item in enumerate(imagens):
-		#			result = st.selectbox('Selecione o valor para a questão {}'.format(i+1), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-		#			nota.append(result)
-
 
 		checkbox2 = st.checkbox('Quero salvar a avaliação das questões')
 
@@ -266,12 +172,8 @@ with st.form("my_form1"):
 			df4 = pd.DataFrame(notas, columns = ['NOTA'])
 
 			df2 = pd.concat([df3, df4], axis=1)
-
-			if fs:
-				destionation_blob_name = '{}/avaliaco_questoes.csv'.format(st.session_state.name)
-				bucket.blob(destionation_blob_name).upload_from_string(df2.to_csv(), 'text/csv')
-			else:
-				df2.to_csv('{}_avaliaco_questoes.csv'.format(st.session_state.name))
+		
+			df2.to_csv('{}_avaliacao_questoes.csv'.format(st.session_state.name))
 
 			nota_final = sum(notas)
 
@@ -316,7 +218,7 @@ with st.form("my_form2"):
 
 	if checkbox0:
 
-		temas = list(set((df.TEMA).to_list()))
+		temas = list(set((df_i.TEMA).to_list()))
 
 		temas_escolhidos = st.multiselect('Quais temas você quer?', temas)
 
@@ -343,9 +245,9 @@ with st.form("my_form2"):
 
 				qtd_perguntas = sum(qtd_temas)
 
-				mask = df['TEMA'].isin(temas_escolhidos)
+				mask = df_i['TEMA'].isin(temas_escolhidos)
 
-				df = df[mask]
+				df = df_i[mask].reset_index(drop=True)
 
 				IND_INIT_SIZE = len(df)
 
@@ -408,13 +310,9 @@ with st.form("my_form2"):
 						df3 = pd.DataFrame(questoes, columns = ['QUESTAO'])
 						df4 = pd.DataFrame(notas, columns = ['NOTA'])
 
-						df2 = pd.concat([df3, df4], axis=1)
+						df2 = pd.concat([df3, df4], axis=1).reset_index(drop=True)
 
-						if fs:
-							destionation_blob_name = '{}/avaliaco_questoes.csv'.format(st.session_state.name)
-							bucket.blob(destionation_blob_name).upload_from_string(df2.to_csv(), 'text/csv')
-						else:
-							df2.to_csv('{}_avaliaco_questoes.csv'.format(st.session_state.name))
+						df2.to_csv('{}_avaliacao_questoes.csv'.format(st.session_state.name))
 
 						nota_final = sum(notas)
 

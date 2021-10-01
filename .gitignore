@@ -3,7 +3,6 @@ htmlcov-py38/
 *.joblib
 .env
 .jpgeg
-.csv
 .toml
 
 # Byte-compiled / optimized / DLL files
